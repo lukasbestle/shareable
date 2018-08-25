@@ -1,0 +1,9 @@
+{
+  "activity": null,
+  "created": 1234567890,
+  "downloads": 0,
+  "expires": 9999999999,
+  "filename": "some-item.txt",
+  "timeout": 2678400,
+  "user": "admin"
+}

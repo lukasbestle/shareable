@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * cleanup
+ *
+ * Verifies the integrity of the items and
+ * files and cleans up expired items
+ */
+
+require_once(__DIR__ . '/../bootstrap.php');
+
+$warnings = $app->items()->cleanUp();
+if ($warnings) {
+    fwrite(STDERR, $warnings);
+    exit(1);
+}

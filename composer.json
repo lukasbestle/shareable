@@ -1,0 +1,51 @@
+{
+    "name": "lukasbestle/shareable",
+    "description": "Simple NoDB file upload app",
+    "require": {
+        "php": ">=7.1.0",
+        "getkirby/cms": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0",
+        "friendsofphp/php-cs-fixer": "^2.11.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "LukasBestle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LukasBestle\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/k-next/kirby"
+        }
+    ],
+    "scripts": {
+        "test": "composer install; vendor/bin/phpunit --stderr --coverage-html=tests/coverage",
+        "fix": "composer install; vendor/bin/php-cs-fixer fix ./src/",
+        "zip": "composer install --no-dev -a; composer archive --file dist --format zip"
+    },
+    "archive": {
+        "exclude": [
+          ".DS_Store",
+          "/.coveralls.yml",
+          "/.php_cs.cache",
+          "/.travis.yml",
+          "/composer.lock",
+          "/config/*",
+          "!/config/config.example.php",
+          "/data/*/*",
+          "/dist.zip",
+          "/phpunit.xml.dist",
+          "/tests",
+          "!/vendor",
+          "/vendor/**/.git"
+        ]
+    }
+}
