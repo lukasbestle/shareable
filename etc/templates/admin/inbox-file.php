@@ -15,16 +15,16 @@
 
 <form action="<?= url('_admin/inbox/' . urlencode($file->getFilename())) ?>" method="POST">
   <label for="created">Created <small>defaults to "now"</small></label>
-  <input type="text" name="created" value="<?= get('created') ?>">
+  <input type="text" id="created" name="created" value="<?= get('created') ?>">
 
   <label for="expires">Expires <small>defaults to "never" if empty</small></label>
-  <input type="text" name="expires" value="<?= get('expires') ?? '+ 1 year' ?>">
+  <input type="text" id="expires" name="expires" value="<?= get('expires') ?? '+ 1 year' ?>">
 
   <label for="id">ID <small>defaults to a random ID</small></label>
-  <input type="text" name="id" value="<?= get('id') ?>">
+  <input type="text" id="id" name="id" value="<?= get('id') ?>">
 
   <label for="timeout">Timeout <small>defaults to "none" if empty</small></label>
-  <input type="text" name="timeout" value="<?= get('timeout') ?? '+ 1 month' ?>">
+  <input type="text" id="timeout" name="timeout" value="<?= get('timeout') ?? '+ 1 month' ?>">
 
   <hr>
 
