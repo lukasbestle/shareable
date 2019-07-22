@@ -14,16 +14,16 @@
 <?php endif ?>
 
 <form action="<?= url('_admin/inbox/' . urlencode($file->getFilename())) ?>" method="POST">
-  <label for="created">Created <span>defaults to "now"</span></label>
+  <label for="created">Created <small>defaults to "now"</small></label>
   <input type="text" name="created" value="<?= get('created') ?>">
 
-  <label for="expires">Expires <span>defaults to "never" if empty</span></label>
+  <label for="expires">Expires <small>defaults to "never" if empty</small></label>
   <input type="text" name="expires" value="<?= get('expires') ?? '+ 1 year' ?>">
 
-  <label for="id">ID <span>defaults to a random ID</span></label>
+  <label for="id">ID <small>defaults to a random ID</small></label>
   <input type="text" name="id" value="<?= get('id') ?>">
 
-  <label for="timeout">Timeout <span>defaults to "none" if empty</span></label>
+  <label for="timeout">Timeout <small>defaults to "none" if empty</small></label>
   <input type="text" name="timeout" value="<?= get('timeout') ?? '+ 1 month' ?>">
 
   <hr>

@@ -180,7 +180,7 @@ label {
   display: block;
   font-weight: bold;
 }
-label span {
+label small {
   font-weight: normal;
   font-size: 0.8rem;
   float: right;
