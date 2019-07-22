@@ -181,17 +181,10 @@ class Item
      */
     public function timeout(string $format = null)
     {
-        if (is_int($this->timeout)) {
-            if (is_int($this->activity)) {
-                // registered activity
-                // -> use that as the base
-                $timeout = $this->activity + $this->timeout;
-            } else {
-                // no registered activity (no downloads)
-                // -> expire the file if the timeout after the creation date passed
-                $timeout = $this->created + $this->timeout;
-            }
+        if (is_int($this->timeout) && is_int($this->activity)) {
+            $timeout = $this->activity + $this->timeout;
         } else {
+            // timeout has not been configured or not been started
             $timeout = false;
         }
 

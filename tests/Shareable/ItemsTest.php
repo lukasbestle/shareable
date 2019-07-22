@@ -98,7 +98,7 @@ class ItemsTest extends TestCase
         $this->assertFileExists($this->itemsPath . '/definitely_invalid.json');
         $this->assertFileNotExists($this->itemsPath . '/expired.json');
         $this->assertFileExists($this->itemsPath . '/invalid-extension.txt');
-        $this->assertFileNotExists($this->itemsPath . '/no-activity.json');
+        $this->assertFileExists($this->itemsPath . '/no-activity.json');
         $this->assertFileExists($this->itemsPath . '/no-expiry.json');
         $this->assertFileExists($this->itemsPath . '/not-started.json');
         $this->assertFileNotExists($this->itemsPath . '/only-expiry.json');
@@ -106,7 +106,7 @@ class ItemsTest extends TestCase
         $this->assertFileExists($this->itemsPath . '/valid.json');
         $this->assertFileExists($this->filesPath . '/.i-am-invisible');
         $this->assertFileNotExists($this->filesPath . '/expired.txt');
-        $this->assertFileNotExists($this->filesPath . '/no-activity.txt');
+        $this->assertFileExists($this->filesPath . '/no-activity.txt');
         $this->assertFileExists($this->filesPath . '/no-expiry.txt');
         $this->assertFileNotExists($this->filesPath . '/only.txt');
         $this->assertFileExists($this->filesPath . '/orphaned.abc.txt');

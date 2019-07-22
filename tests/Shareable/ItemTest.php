@@ -129,8 +129,8 @@ class ItemTest extends TestCase
         $this->assertEquals('2009-05-17', $item->timeout('Y-m-d'));
 
         $item = new Item($this->app, $this->itemsPath . '/no-activity.json');
-        $this->assertEquals(1237246290, $item->timeout());
-        $this->assertEquals('2009-03-16', $item->timeout('Y-m-d'));
+        $this->assertEquals(false, $item->timeout());
+        $this->assertEquals('–', $item->timeout('Y-m-d'));
 
         $item = new Item($this->app, $this->itemsPath . '/no-expiry.json');
         $this->assertEquals(false, $item->timeout());
@@ -303,6 +303,7 @@ class ItemTest extends TestCase
 
         // custom props
         $item = Item::create($this->app, $this->itemsPath, [
+            'activity' => 7899999999,
             'created'  => 7899999999,
             'expires'  => 9999999999,
             'filename' => 'another-test-item',

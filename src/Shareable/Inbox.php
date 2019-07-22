@@ -174,6 +174,17 @@ class Inbox extends Collection
             }
         }
 
+        // start timeout immediately if requested
+        if (isset($props['timeout-immediately']) && $props['timeout-immediately'] === 'true') {
+            // only supported if a timeout is set
+            if (!isset($props['timeout'])) {
+                throw new Exception('Cannot start timeout immediately if no timeout is set');
+            }
+
+            $props['activity'] = $props['created'] ?? time();
+            unset($props['timeout-immediately']);
+        }
+
         // make sure we don't overwrite any existing file
         $filename = static::findFilepath($this->filesPath, $file->getFilename());
 

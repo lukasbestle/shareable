@@ -26,6 +26,11 @@
   <label for="timeout">Timeout <small>defaults to "none" if empty</small></label>
   <input type="text" id="timeout" name="timeout" value="<?= get('timeout') ?? '+ 1 month' ?>">
 
+  <div class="input-wrapper">
+    <input type="checkbox" id="timeout-immediately" name="timeout-immediately" value="true"<?php if (get('timeout-immediately') === 'true'): ?> checked<?php endif ?>>
+    <label for="timeout-immediately" class="label--checkbox">Start timeout immediately</label>
+  </div>
+
   <hr>
 
   <input type="hidden" name="response" value="redirect">

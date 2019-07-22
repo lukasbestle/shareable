@@ -307,6 +307,87 @@ class InboxTest extends TestCase
     /**
      * @covers ::publish
      */
+    public function testPublishImmediateTimeout1()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = [
+            'created'             => '2018-01-02',
+            'expires'             => '',
+            'id'                  => 'new-id',
+            'timeout'             => 3600,
+            'timeout-immediately' => 'true',
+            'user'                => 'admin'
+        ];
+
+        $response = $this->inbox->publish('new-file.txt');
+        $this->assertEquals([
+            'activity'  => strtotime('2018-01-02'),
+            'created'   => strtotime('2018-01-02'),
+            'downloads' => 0,
+            'expires'   => false,
+            'filename'  => 'new-file.txt',
+            'timeout'   => 3600,
+            'user'      => 'anonymous'
+        ], $this->app->items()->get('new-id')->toArray());
+    }
+
+    /**
+     * @covers ::publish
+     */
+    public function testPublishImmediateTimeout2()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = [
+            'created'             => '',
+            'expires'             => '',
+            'id'                  => 'new-id',
+            'timeout'             => 3600,
+            'timeout-immediately' => 'true',
+            'user'                => 'admin'
+        ];
+
+        $response = $this->inbox->publish('new-file.txt');
+        $this->assertEquals([
+            'activity'  => time(),
+            'created'   => time(),
+            'downloads' => 0,
+            'expires'   => false,
+            'filename'  => 'new-file.txt',
+            'timeout'   => 3600,
+            'user'      => 'anonymous'
+        ], $this->app->items()->get('new-id')->toArray());
+    }
+
+    /**
+     * @covers ::publish
+     */
+    public function testPublishImmediateTimeout3()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = [
+            'created'             => '2018-01-02',
+            'expires'             => '',
+            'id'                  => 'new-id',
+            'timeout'             => 3600,
+            'timeout-immediately' => 'gibberish',
+            'user'                => 'admin'
+        ];
+
+        $response = $this->inbox->publish('new-file.txt');
+        $this->assertEquals([
+            'activity'  => null,
+            'created'   => strtotime('2018-01-02'),
+            'downloads' => 0,
+            'expires'   => false,
+            'filename'  => 'new-file.txt',
+            'timeout'   => 3600,
+            'user'      => 'anonymous'
+        ], $this->app->items()->get('new-id')->toArray());
+    }
+
+    /**
+     * @covers ::publish
+     */
     public function testPublishInvalidCreated()
     {
         $this->expectException(Exception::class);
@@ -339,6 +420,27 @@ class InboxTest extends TestCase
             'id'      => 'new-id',
             'timeout' => 'some gibberish',
             'user'    => 'admin'
+        ];
+
+        $this->inbox->publish('valid.txt');
+    }
+
+    /**
+     * @covers ::publish
+     */
+    public function testPublishInvalidTimeoutImmediate()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Cannot start timeout immediately if no timeout is set');
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = [
+            'created'             => '2018-01-02',
+            'expires'             => '',
+            'id'                  => 'new-id',
+            'timeout'             => '',
+            'timeout-immediately' => 'true',
+            'user'                => 'admin'
         ];
 
         $this->inbox->publish('valid.txt');
