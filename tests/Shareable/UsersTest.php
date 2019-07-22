@@ -4,8 +4,14 @@ namespace LukasBestle\Shareable;
 
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
+/**
+ * @coversDefaultClass LukasBestle\Shareable\Users
+ */
 class UsersTest extends PHPUnitTestCase
 {
+    /**
+     * @covers ::__construct
+     */
     public function testConstruct()
     {
         $users = new Users([]);
@@ -27,6 +33,9 @@ class UsersTest extends PHPUnitTestCase
         $this->assertFalse($users->get('anonymous')->hasPermission('publish'));
     }
 
+    /**
+     * @covers ::current
+     */
     public function testCurrent()
     {
         $users = new Users([

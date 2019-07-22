@@ -2,6 +2,7 @@
 
 namespace LukasBestle\Shareable;
 
+use Exception;
 use ReflectionMethod;
 use SplFileInfo;
 use Kirby\Cms\App as Kirby;
@@ -28,6 +29,9 @@ function move_uploaded_file(string $filename, string $destination): bool
     return copy($filename, $destination);
 }
 
+/**
+ * @coversDefaultClass LukasBestle\Shareable\Inbox
+ */
 class InboxTest extends TestCase
 {
     protected $inbox;
@@ -46,6 +50,9 @@ class InboxTest extends TestCase
         unset($_FILES);
     }
 
+    /**
+     * @covers ::__construct
+     */
     public function testConstruct()
     {
         $this->assertEquals(2, $this->inbox->count());
@@ -56,6 +63,9 @@ class InboxTest extends TestCase
         $this->assertInstanceOf(SplFileInfo::class, $this->inbox->get('valid.txt'));
     }
 
+    /**
+     * @covers ::delete
+     */
     public function testDelete()
     {
         // existing file
@@ -72,6 +82,9 @@ class InboxTest extends TestCase
         $this->assertEquals('Not found', $response->body());
     }
 
+    /**
+     * @covers ::upload
+     */
     public function testUpload()
     {
         $_FILES = [
@@ -100,6 +113,9 @@ class InboxTest extends TestCase
         $this->assertEquals(302, $response->code());
     }
 
+    /**
+     * @covers ::upload
+     */
     public function testUploadMultiple()
     {
         $_FILES = [
@@ -121,20 +137,24 @@ class InboxTest extends TestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage No file was uploaded
+     * @covers ::upload
      */
     public function testUploadNoFiles()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('No file was uploaded');
+
         $this->inbox->upload();
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage File upload error: "1"
+     * @covers ::upload
      */
     public function testUploadError()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('File upload error: "1"');
+
         $_FILES = [
             'files' => [
                 'name'     => ['valid.txt', 'valid.txt'],
@@ -150,11 +170,13 @@ class InboxTest extends TestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage File "valid.txt" was not properly uploaded
+     * @covers ::upload
      */
     public function testUploadNotUploadedFile()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('File "valid.txt" was not properly uploaded');
+
         $_FILES = [
             'files' => [
                 'name'     => 'valid.txt',
@@ -167,11 +189,13 @@ class InboxTest extends TestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage Could not move uploaded file "error.txt"
+     * @covers ::upload
      */
     public function testUploadMovingError()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Could not move uploaded file "error.txt"');
+
         $_FILES = [
             'files' => [
                 'name'     => 'error.txt',
@@ -183,6 +207,9 @@ class InboxTest extends TestCase
         $this->inbox->upload();
     }
 
+    /**
+     * @covers ::publish
+     */
     public function testPublish()
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -218,6 +245,9 @@ class InboxTest extends TestCase
         $this->assertEquals('Not found', $response->body());
     }
 
+    /**
+     * @covers ::publish
+     */
     public function testPublishRedirect()
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -248,6 +278,9 @@ class InboxTest extends TestCase
         $this->assertEquals(302, $response->code());
     }
 
+    /**
+     * @covers ::publish
+     */
     public function testPublishNumericTimeout()
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -272,11 +305,13 @@ class InboxTest extends TestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage Could not convert value "some gibberish" for prop "created" to timestamp
+     * @covers ::publish
      */
     public function testPublishInvalidCreated()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Could not convert value "some gibberish" for prop "created" to timestamp');
+
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST = [
             'created' => 'some gibberish',
@@ -290,11 +325,13 @@ class InboxTest extends TestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage Could not convert value "some gibberish" for prop "timeout" to integer
+     * @covers ::publish
      */
     public function testPublishInvalidTimeout()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Could not convert value "some gibberish" for prop "timeout" to integer');
+
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST = [
             'created' => '2018-01-02',
@@ -307,6 +344,9 @@ class InboxTest extends TestCase
         $this->inbox->publish('valid.txt');
     }
 
+    /**
+     * @covers ::findFilepath
+     */
     public function testFindFilepath()
     {
         $method = new ReflectionMethod(Inbox::class, 'findFilepath');

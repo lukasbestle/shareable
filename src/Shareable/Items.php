@@ -26,6 +26,7 @@ class Items
     /**
      * Class constructor
      *
+     * @codeCoverageIgnore
      * @param App    $app  App instance
      * @param string $path Path to the items directory
      */

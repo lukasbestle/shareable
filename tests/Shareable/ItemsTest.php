@@ -2,6 +2,9 @@
 
 namespace LukasBestle\Shareable;
 
+/**
+ * @coversDefaultClass LukasBestle\Shareable\Items
+ */
 class ItemsTest extends TestCase
 {
     protected $items;
@@ -13,6 +16,9 @@ class ItemsTest extends TestCase
         $this->items = $this->app->items();
     }
 
+    /**
+     * @covers ::collection
+     */
     public function testCollection()
     {
         $collection = new ItemCollection($this->app, $this->itemsPath);
@@ -22,6 +28,9 @@ class ItemsTest extends TestCase
         $this->assertTrue($returnedCollection === $this->items->collection());
     }
 
+    /**
+     * @covers ::exists
+     */
     public function testExists()
     {
         $this->assertTrue($this->items->exists('valid'));
@@ -29,12 +38,18 @@ class ItemsTest extends TestCase
         $this->assertFalse($this->items->exists('does-not-exist-at-all'));
     }
 
+    /**
+     * @covers ::get
+     */
     public function testGet()
     {
         $this->assertNull($this->items->get('does-not-exist-at-all'));
         $this->assertInstanceOf(Item::class, $this->items->get('valid'));
     }
 
+    /**
+     * @covers ::create
+     */
     public function testCreate()
     {
         $this->assertFileNotExists($this->itemsPath . '/tmp.json');
@@ -48,6 +63,9 @@ class ItemsTest extends TestCase
         unlink($this->itemsPath . '/tmp.json');
     }
 
+    /**
+     * @covers ::cleanUp
+     */
     public function testCleanUp()
     {
         $this->assertFileExists($this->itemsPath . '/.i-am-invisible');

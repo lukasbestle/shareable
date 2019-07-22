@@ -5,29 +5,94 @@ namespace LukasBestle\Shareable;
 use Exception;
 use ReflectionProperty;
 
+/**
+ * @coversDefaultClass LukasBestle\Shareable\App
+ */
 class AppTest extends TestCase
 {
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage The property "paths[items]" is required
+     * @covers ::__construct
+     * @covers ::setDebug
+     * @covers ::setFileUrl
+     * @covers ::setPaths
+     * @covers ::setRoutes
+     * @covers ::setUsers
+     * @covers ::debug
+     * @covers ::filePath
+     * @covers ::users
      */
-    public function testConstructMissingPath()
+    public function testConstruct()
     {
-        new App([
+        $routesProp = new ReflectionProperty(App::class, 'routes');
+        $routesProp->setAccessible(true);
+
+        // minimum config
+        $app = new App([
             'fileUrl' => 'https://cdn.example.com',
             'paths'   => [
                 'files' => $this->filesPath,
                 'inbox' => $this->inboxPath,
+                'items' => $this->itemsPath
+            ]
+        ]);
+        $this->assertEquals(false, $app->debug());
+        $this->assertEquals('https://cdn.example.com/', $app->fileUrl());
+        $this->assertEquals($this->filesPath . '/', $app->filePath());
+        $this->assertEquals(1, count($app->users()));
+        $this->assertEquals('anonymous', $app->users()->first()->username());
+
+        // overridden defaults
+        $app = new App([
+            'debug'   => true,
+            'fileUrl' => 'https://example.com/cdn///',
+            'paths'   => [
+                'files' => $this->filesPath . '///',
+                'inbox' => $this->inboxPath,
+                'items' => $this->itemsPath
+            ],
+            'routes' => [
+                'test-route'
+            ],
+            'users' => [
+                'lukas' => []
+            ]
+        ]);
+        $this->assertEquals(true, $app->debug());
+        $this->assertEquals('https://example.com/cdn/', $app->fileUrl());
+        $this->assertEquals($this->filesPath . '/', $app->filePath());
+        $this->assertContains('test-route', $routesProp->getValue($app));
+        $this->assertEquals(2, count($app->users()));
+        $this->assertEquals('lukas', $app->users()->first()->username());
+
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::setPaths
+     */
+    public function testConstructMissingPath()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('The property "paths[items]" is required');
+
+        new App([
+            'fileUrl' => 'https://cdn.example.com',
+            'paths'   => [
+                'files' => $this->filesPath,
+                'inbox' => $this->inboxPath
             ]
         ]);
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage The path "/tmp/does-not-exist" does not exist or is not writable
+     * @covers ::__construct
+     * @covers ::setPaths
      */
     public function testConstructInvalidPath()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('The path "/tmp/does-not-exist" does not exist or is not writable');
+
         new App([
             'fileUrl' => 'https://cdn.example.com',
             'paths'   => [
@@ -38,6 +103,9 @@ class AppTest extends TestCase
         ]);
     }
 
+    /**
+     * @covers ::render
+     */
     public function testRender()
     {
         $app = $this->instanceWithRoutes(false);
@@ -81,23 +149,35 @@ class AppTest extends TestCase
         $this->assertEquals(500, $response->code());
     }
 
+    /**
+     * @covers ::debug
+     */
     public function testDebug()
     {
         $this->assertEquals(false, $this->app->debug());
     }
 
+    /**
+     * @covers ::fileUrl
+     */
     public function testFileUrl()
     {
         $this->assertEquals('https://cdn.example.com/', $this->app->fileUrl());
         $this->assertEquals('https://cdn.example.com/file.txt', $this->app->fileUrl('file.txt'));
     }
 
+    /**
+     * @covers ::filePath
+     */
     public function testFilePath()
     {
         $this->assertEquals($this->filesPath . '/', $this->app->filePath());
         $this->assertEquals($this->filesPath . '/file.txt', $this->app->filePath('file.txt'));
     }
 
+    /**
+     * @covers ::inbox
+     */
     public function testInbox()
     {
         $appProp = new ReflectionProperty(Inbox::class, 'app');
@@ -116,6 +196,9 @@ class AppTest extends TestCase
         $this->assertTrue($this->app->inbox() === $inbox);
     }
 
+    /**
+     * @covers ::items
+     */
     public function testItems()
     {
         $appProp = new ReflectionProperty(Items::class, 'app');
@@ -131,6 +214,9 @@ class AppTest extends TestCase
         $this->assertTrue($this->app->items() === $items);
     }
 
+    /**
+     * @covers ::user
+     */
     public function testUser()
     {
         $app = $this->instanceWithRoutes(false);
@@ -150,6 +236,9 @@ class AppTest extends TestCase
         $this->assertNull($app->user('does-not-exist'));
     }
 
+    /**
+     * @covers ::request
+     */
     public function testRequest()
     {
         $request = $this->app->request();
@@ -159,6 +248,7 @@ class AppTest extends TestCase
     }
 
     /**
+     * @covers       ::requestPath
      * @dataProvider providerRequestPath
      */
     public function testRequestPath(string $scriptName, string $uri, string $expected)
@@ -169,6 +259,7 @@ class AppTest extends TestCase
         $this->assertEquals($expected, $requestPath);
 
         // should be cached
+        $_SERVER['REQUEST_URI'] = 'something-different';
         $this->assertTrue($this->app->requestPath() === $requestPath);
     }
 
@@ -181,6 +272,28 @@ class AppTest extends TestCase
         ];
     }
 
+    /**
+     * @covers ::requestPath
+     * @covers ::setRequestPath
+     */
+    public function testRequestPathCustom()
+    {
+        $app = new App([
+            'fileUrl'     => 'https://cdn.example.com',
+            'requestPath' => '/amazing-path//',
+            'paths'       => [
+                'files' => $this->filesPath,
+                'inbox' => $this->inboxPath,
+                'items' => $this->itemsPath
+            ]
+        ]);
+
+        $this->assertEquals('amazing-path', $app->requestPath());
+    }
+
+    /**
+     * @covers ::snippet
+     */
     public function testSnippet()
     {
         // simple example
@@ -192,7 +305,10 @@ class AppTest extends TestCase
         $this->assertEquals('', $result);
     }
 
-    public function testTemplates()
+    /**
+     * @covers ::template
+     */
+    public function testTemplate()
     {
         // simple example
         $result = $this->app->template('_test', ['var' => 'test']);

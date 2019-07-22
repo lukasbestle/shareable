@@ -4,6 +4,11 @@ namespace LukasBestle\Shareable;
 
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
+use Exception;
+
+/**
+ * @coversDefaultClass LukasBestle\Shareable\BijectiveEncoder
+ */
 class BijectiveEncoderTest extends PHPUnitTestCase
 {
     protected $defaultAlphabet;
@@ -22,6 +27,8 @@ class BijectiveEncoderTest extends PHPUnitTestCase
     }
 
     /**
+     * @covers       ::encode
+     * @covers       ::decode
      * @dataProvider providerBase36
      */
     public function testBase36($integer)
@@ -48,6 +55,8 @@ class BijectiveEncoderTest extends PHPUnitTestCase
     }
 
     /**
+     * @covers       ::encode
+     * @covers       ::decode
      * @dataProvider providerDefault
      */
     public function testDefault($integer, $string)
@@ -74,35 +83,44 @@ class BijectiveEncoderTest extends PHPUnitTestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage Only positive integers are supported
+     * @covers ::encode
      */
     public function testEncodeInvalid()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Only positive integers are supported');
+
         BijectiveEncoder::encode(-1);
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage Char "0" is not in the alphabet
+     * @covers ::decode
      */
     public function testDecodeInvalid1()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Char "0" is not in the alphabet');
+
         // default alphabet doesn't have 0 and 1
         BijectiveEncoder::decode('2c7h01ac');
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage Char "a" is not in the alphabet
+     * @covers ::decode
      */
     public function testDecodeInvalid2()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Char "a" is not in the alphabet');
+
         // alphabet without "a"
         BijectiveEncoder::$alphabet = '0123456789bcdefghijklmnopqrstuvwxyz';
         BijectiveEncoder::decode('2c7h01ac');
     }
 
+    /**
+     * @covers ::randomString
+     */
     public function testRandomString()
     {
         BijectiveEncoder::$alphabet = '0123456789abcdef';
@@ -113,20 +131,24 @@ class BijectiveEncoderTest extends PHPUnitTestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage $chars must be at least 1
+     * @covers ::randomString
      */
     public function testRandomStringInvalid1()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('$chars must be at least 1');
+
         BijectiveEncoder::randomString(0);
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage $chars must be at least 1
+     * @covers ::randomString
      */
     public function testRandomStringInvalid2()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('$chars must be at least 1');
+
         BijectiveEncoder::randomString(-1);
     }
 }

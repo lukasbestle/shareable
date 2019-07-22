@@ -4,8 +4,20 @@ namespace LukasBestle\Shareable;
 
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
+use Exception;
+
+/**
+ * @coversDefaultClass LukasBestle\Shareable\User
+ */
 class UserTest extends PHPUnitTestCase
 {
+    /**
+     * @covers ::__construct
+     * @covers ::setUsername
+     * @covers ::setPassword
+     * @covers ::setPermissions
+     * @covers ::username
+     */
     public function testConstruct()
     {
         $user = new User([
@@ -17,11 +29,14 @@ class UserTest extends PHPUnitTestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage Invalid password hash for user "test-user", expected one created with password_hash()
+     * @covers ::__construct
+     * @covers ::setPassword
      */
     public function testConstructInvalid1()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Invalid password hash for user "test-user", expected one created with password_hash()');
+
         new User([
             'username'    => 'test-user',
             'password'    => '$2y$10$this-is-invalid',
@@ -30,11 +45,14 @@ class UserTest extends PHPUnitTestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage Invalid permissions for user "test-user", expected array or boolean
+     * @covers ::__construct
+     * @covers ::setPermissions
      */
     public function testConstructInvalid2()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Invalid permissions for user "test-user", expected array or boolean');
+
         new User([
             'username'    => 'test-user',
             'password'    => '$2y$10$M6Ji9eZ8mYy5Y7StubwEcOWr20fV80nyDBGOc1R9FPW3fA8sG2oDm',
@@ -42,6 +60,9 @@ class UserTest extends PHPUnitTestCase
         ]);
     }
 
+    /**
+     * @covers ::verifyPassword
+     */
     public function testVerifyPassword()
     {
         $user = new User([
@@ -50,14 +71,19 @@ class UserTest extends PHPUnitTestCase
         ]);
         $this->assertTrue($user->verifyPassword('12345678'));
         $this->assertFalse($user->verifyPassword('87654321'));
+        $this->assertFalse($user->verifyPassword(''));
 
         $user = new User([
             'username' => 'test-user'
         ]);
         $this->assertFalse($user->verifyPassword('12345678'));
         $this->assertFalse($user->verifyPassword('87654321'));
+        $this->assertFalse($user->verifyPassword(''));
     }
 
+    /**
+     * @covers ::hasPermission
+     */
     public function testHasPermission()
     {
         $user = new User([
@@ -96,11 +122,13 @@ class UserTest extends PHPUnitTestCase
     }
 
     /**
-     * @expectedException        Exception
-     * @expectedExceptionMessage Invalid param $permission, expected string or array
+     * @covers ::hasPermission
      */
     public function testHasPermissionInvalid()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Invalid param $permission, expected string or array');
+
         $user = new User([
             'username'    => 'test-user',
             'permissions' => false

@@ -2,8 +2,14 @@
 
 namespace LukasBestle\Shareable;
 
+/**
+ * @coversDefaultClass LukasBestle\Shareable\ItemCollection
+ */
 class ItemCollectionTest extends TestCase
 {
+    /**
+     * @covers ::__construct
+     */
     public function testConstruct()
     {
         $collection = new ItemCollection($this->app, $this->itemsPath);
