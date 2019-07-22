@@ -141,48 +141,43 @@ class Inbox extends Collection
         }
 
         // clean up props
-        $props = $this->app->request()->data();
-        foreach ($props as $prop => $value) {
-            // delete empty props so that the default is used
-            if ($value === '') {
-                unset($props[$prop]);
-                continue;
-            }
+        $props = [];
+        $data = $this->app->request()->data();
 
-            // convert the date fields to timestamp
-            if (in_array($prop, ['created', 'expires']) && !is_numeric($value)) {
-                $props[$prop] = strtotime($value);
-                if (!is_int($props[$prop])) {
-                    $message = sprintf('Could not convert value "%s" for prop "%s" to timestamp', $value, $prop);
+        if (isset($data['created']) && $data['created'] !== '') {
+            $props['created'] = static::parseTime('Created', $data['created'], time());
+        }
+
+        if (isset($data['expires']) && $data['expires'] !== '') {
+            $props['expires'] = static::parseTime('Expires', $data['expires'], $props['created'] ?? time());
+        }
+
+        if (isset($data['id']) && $data['id'] !== '') {
+            $props['id'] = $data['id'];
+        }
+
+        if (isset($data['timeout']) && $data['timeout'] !== '') {
+            if (is_numeric($data['timeout'])) {
+                $props['timeout'] = (int)$data['timeout'];
+            } else {
+                // convert natural language to the number of seconds
+                $timestamp = strtotime($data['timeout']);
+                if (!is_int($timestamp)) {
+                    $message = sprintf('Could not convert value "%s" for field "Timeout" to integer', $data['timeout']);
                     throw new Exception($message);
                 }
-            }
-
-            // convert the timeout to an int
-            if ($prop === 'timeout') {
-                if (is_numeric($value)) {
-                    $props[$prop] = (int)$value;
-                } else {
-                    // convert natural language to the number of seconds
-                    $timestamp = strtotime($value);
-                    if (!is_int($timestamp)) {
-                        $message = sprintf('Could not convert value "%s" for prop "%s" to integer', $value, $prop);
-                        throw new Exception($message);
-                    }
-                    $props[$prop] = $timestamp - time();
-                }
+                $props['timeout'] = $timestamp - time();
             }
         }
 
         // start timeout immediately if requested
-        if (isset($props['timeout-immediately']) && $props['timeout-immediately'] === 'true') {
+        if (isset($data['timeout-immediately']) && $data['timeout-immediately'] === 'true') {
             // only supported if a timeout is set
             if (!isset($props['timeout'])) {
                 throw new Exception('Cannot start timeout immediately if no timeout is set');
             }
 
             $props['activity'] = $props['created'] ?? time();
-            unset($props['timeout-immediately']);
         }
 
         // make sure we don't overwrite any existing file
@@ -228,5 +223,28 @@ class Inbox extends Collection
         }
 
         return $filename;
+    }
+
+    /**
+     * Converts a time string (human-readable form) to a timestamp
+     *
+     * @param  string $name  Field name for error messages
+     * @param  string $value Value to parse
+     * @param  int    $base  Base timestamp for relative times
+     * @return int
+     */
+    protected static function parseTime(string $name, string $value, int $base): int
+    {
+        if (is_numeric($value)) {
+            return (int)$value;
+        }
+
+        $valueConverted = strtotime($value, $base);
+        if (!is_int($valueConverted)) {
+            $message = sprintf('Could not convert value "%s" for field "%s" to timestamp', $value, $name);
+            throw new Exception($message);
+        }
+
+        return $valueConverted;
     }
 }

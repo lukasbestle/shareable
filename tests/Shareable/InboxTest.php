@@ -215,7 +215,7 @@ class InboxTest extends TestCase
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST = [
             'created' => '2018-01-02',
-            'expires' => '',
+            'expires' => '+1 day',
             'id'      => 'new-id',
             'timeout' => '+2 days',
             'user'    => 'admin'
@@ -227,7 +227,7 @@ class InboxTest extends TestCase
             'activity'  => null,
             'created'   => strtotime('2018-01-02'),
             'downloads' => 0,
-            'expires'   => false,
+            'expires'   => strtotime('2018-01-03'),
             'filename'  => 'new-file.txt',
             'timeout'   => 172800,
             'user'      => 'anonymous'
@@ -391,7 +391,7 @@ class InboxTest extends TestCase
     public function testPublishInvalidCreated()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Could not convert value "some gibberish" for prop "created" to timestamp');
+        $this->expectExceptionMessage('Could not convert value "some gibberish" for field "Created" to timestamp');
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST = [
@@ -411,7 +411,7 @@ class InboxTest extends TestCase
     public function testPublishInvalidTimeout()
     {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Could not convert value "some gibberish" for prop "timeout" to integer');
+        $this->expectExceptionMessage('Could not convert value "some gibberish" for field "Timeout" to integer');
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST = [
@@ -460,5 +460,37 @@ class InboxTest extends TestCase
         $this->assertEquals('only-1-1.txt', $method->invoke(null, $this->filesPath, 'only-1.txt'));
         $this->assertEquals('new-file.abc.txt', $method->invoke(null, $this->filesPath, 'new-file.abc.txt'));
         $this->assertEquals('orphaned.abc-1.txt', $method->invoke(null, $this->filesPath, 'orphaned.abc.txt'));
+    }
+
+    /**
+     * @covers ::parseTime
+     */
+    public function testParseTime()
+    {
+        $method = new ReflectionMethod(Inbox::class, 'parseTime');
+        $method->setAccessible(true);
+
+        $this->assertEquals(12345, $method->invoke(null, 'Test Field', 12345, 0));
+        $this->assertEquals(12345, $method->invoke(null, 'Test Field', 12345, 100000));
+        $this->assertEquals(12345, $method->invoke(null, 'Test Field', '12345', 0));
+        $this->assertEquals(12345, $method->invoke(null, 'Test Field', '12345', 100000));
+        $this->assertEquals(strtotime('2018-01-01'), $method->invoke(null, 'Test Field', '2018-01-01', 0));
+        $this->assertEquals(strtotime('2018-01-01'), $method->invoke(null, 'Test Field', '2018-01-01', 100000));
+        $this->assertEquals(3600, $method->invoke(null, 'Test Field', '+1 hour', 0));
+        $this->assertEquals(103600, $method->invoke(null, 'Test Field', '+1 hour', 100000));
+    }
+
+    /**
+     * @covers ::parseTime
+     */
+    public function testParseTimeInvalid()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Could not convert value "some-gibberish" for field "Test Field" to timestamp');
+
+        $method = new ReflectionMethod(Inbox::class, 'parseTime');
+        $method->setAccessible(true);
+
+        $method->invoke(null, 'Test Field', 'some-gibberish', 0);
     }
 }
