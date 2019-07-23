@@ -255,6 +255,42 @@ class ItemTest extends TestCase
     }
 
     /**
+     * @covers ::delete
+     */
+    public function testDeleteSubdir1()
+    {
+        // setup
+        copy($this->itemsPath . '/expired-with-dir.json', $this->itemsPath . '/expired-with-dir.json');
+        $this->assertFileExists($this->filesPath . '/existing-id/file.txt');
+        $this->assertFileExists($this->itemsPath . '/expired-with-dir.json');
+
+        $item = new Item($this->app, $this->itemsPath . '/expired-with-dir.json');
+        $item->delete();
+
+        $this->assertFileNotExists($this->filesPath . '/existing-id/file.txt');
+        $this->assertFileNotExists($this->itemsPath . '/expired-with-dir.json');
+        $this->assertDirectoryNotExists($this->filesPath . '/existing-id');
+    }
+
+    /**
+     * @covers ::delete
+     */
+    public function testDeleteSubdir2()
+    {
+        // setup
+        copy($this->itemsPath . '/valid-with-dir.json', $this->itemsPath . '/valid-with-dir.json');
+        $this->assertFileExists($this->filesPath . '/another-id/file.txt');
+        $this->assertFileExists($this->itemsPath . '/valid-with-dir.json');
+
+        $item = new Item($this->app, $this->itemsPath . '/valid-with-dir.json');
+        $item->delete();
+
+        $this->assertFileNotExists($this->filesPath . '/another-id/file.txt');
+        $this->assertFileNotExists($this->itemsPath . '/valid-with-dir.json');
+        $this->assertDirectoryExists($this->filesPath . '/another-id'); // there is still a file in that dir
+    }
+
+    /**
      * @covers ::isValidId
      */
     public function testIsValidId()

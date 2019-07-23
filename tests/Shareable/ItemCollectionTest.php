@@ -13,8 +13,9 @@ class ItemCollectionTest extends TestCase
     public function testConstruct()
     {
         $collection = new ItemCollection($this->app, $this->itemsPath);
-        $this->assertEquals(8, $collection->count());
+        $this->assertEquals(9, $collection->count());
         $this->assertEquals([
+            'expired-with-dir',
             'expired',
             'no-activity',
             'no-expiry',

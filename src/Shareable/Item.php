@@ -4,8 +4,10 @@ namespace LukasBestle\Shareable;
 
 use Exception;
 use Kirby\Http\Response;
+use Kirby\Toolkit\Dir;
 use Kirby\Toolkit\F;
 use Kirby\Toolkit\Properties;
+use Kirby\Toolkit\Str;
 
 /**
  * Item
@@ -288,14 +290,25 @@ class Item
      */
     public function delete(): void
     {
+        // delete item meta file
         $item = $this->path;
         if (is_file($item) && @unlink($item) !== true) {
             throw new Exception(sprintf('Could not delete item "%s"', $item)); // @codeCoverageIgnore
         }
 
+        // delete file
         $file = $this->app->filePath($this->filename);
         if (is_file($file) && @unlink($file) !== true) {
             throw new Exception(sprintf('Could not delete file "%s" for item "%s"', $file, $item)); // @codeCoverageIgnore
+        }
+
+        // delete file subdir if it is now empty
+        if (Str::contains($this->filename, '/') === true) {
+            $dir = dirname($file);
+
+            if (Dir::isEmpty($dir) === true && @rmdir($dir) !== true) {
+                throw new Exception(sprintf('Could not delete subdir "%s" for item "%s"', $dir, $item)); // @codeCoverageIgnore
+            }
         }
 
         $this->deleted = true;

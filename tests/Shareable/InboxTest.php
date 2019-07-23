@@ -471,10 +471,10 @@ class InboxTest extends TestCase
         $this->assertEquals('id/new-file.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'id', 'new-file.txt'));
         $this->assertDirectoryExists($this->filesPath . '/id');
 
-        $this->assertEquals('another-id/valid.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'another-id', 'valid.txt'));
-        $this->assertEquals('another-id-1/only.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'another-id', 'only.txt'));
-        $this->assertEquals('another-id-2/only.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'another-id', 'only.txt'));
-        $this->assertEquals('another-id-1-1/only.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'another-id-1', 'only.txt'));
+        $this->assertEquals('different-id/valid.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'different-id', 'valid.txt'));
+        $this->assertEquals('different-id-1/only.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'different-id', 'only.txt'));
+        $this->assertEquals('different-id-2/only.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'different-id', 'only.txt'));
+        $this->assertEquals('different-id-1-1/only.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'different-id-1', 'only.txt'));
 
         // subdir mode but subdirs disabled in config
         $subdirsProp->setValue($this->app, false);

@@ -3,7 +3,8 @@
 namespace LukasBestle\Shareable;
 
 use Exception;
-use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Items
@@ -109,8 +110,8 @@ class Items
                 $file = $this->app->filePath($item->filename());
 
                 if (is_file($file)) {
-                    // note the filename down for later
-                    $files[] = $item->filename();
+                    // note the file path down for later
+                    $files[] = $file;
                 } else {
                     $warnings .= sprintf(
                         'File "%s" for item "%s" does not exist' . "\n",
@@ -122,14 +123,15 @@ class Items
         }
 
         // find orphaned files
-        foreach (new FilesystemIterator($this->app->filePath()) as $file) {
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->app->filePath()));
+        foreach ($iterator as $file) {
             // skip dotfiles like .gitignore
             if (substr($file->getFilename(), 0, 1) === '.') {
                 continue;
             }
 
             // check if we encountered the file in any item before
-            if (!in_array($file->getFilename(), $files)) {
+            if (!in_array($file->getPathname(), $files)) {
                 $warnings .= sprintf('File "%s" is orphaned' . "\n", $file->getPathname());
             }
         }

@@ -71,6 +71,7 @@ class ItemsTest extends TestCase
         $this->assertFileExists($this->itemsPath . '/.i-am-invisible');
         $this->assertFileExists($this->itemsPath . '/definitely_invalid.json');
         $this->assertFileExists($this->itemsPath . '/expired.json');
+        $this->assertFileExists($this->itemsPath . '/expired-with-dir.json');
         $this->assertFileExists($this->itemsPath . '/invalid-extension.txt');
         $this->assertFileExists($this->itemsPath . '/no-activity.json');
         $this->assertFileExists($this->itemsPath . '/no-expiry.json');
@@ -78,7 +79,12 @@ class ItemsTest extends TestCase
         $this->assertFileExists($this->itemsPath . '/only-expiry.json');
         $this->assertFileExists($this->itemsPath . '/only-timeout.json');
         $this->assertFileExists($this->itemsPath . '/valid.json');
+        $this->assertFileExists($this->itemsPath . '/valid-with-dir.json');
         $this->assertFileExists($this->filesPath . '/.i-am-invisible');
+        $this->assertFileExists($this->filesPath . '/another-id/file.txt');
+        $this->assertFileExists($this->filesPath . '/another-id/another-file.txt');
+        $this->assertFileExists($this->filesPath . '/existing-id/file.txt');
+        $this->assertFileExists($this->filesPath . '/orphaned/orphaned.txt');
         $this->assertFileExists($this->filesPath . '/expired.txt');
         $this->assertFileExists($this->filesPath . '/no-activity.txt');
         $this->assertFileExists($this->filesPath . '/no-expiry.txt');
@@ -89,6 +95,8 @@ class ItemsTest extends TestCase
         $warnings = $this->items->cleanUp();
         $this->assertEquals(
             'File "' . $this->filesPath . '/missing-file.txt" for item "not-started" does not exist' . "\n" .
+            'File "' . $this->filesPath . '/another-id/another-file.txt" is orphaned' . "\n" .
+            'File "' . $this->filesPath . '/orphaned/orphaned.txt" is orphaned' . "\n" .
             'File "' . $this->filesPath . '/orphaned.abc.txt" is orphaned' . "\n",
 
             $warnings
@@ -97,6 +105,7 @@ class ItemsTest extends TestCase
         $this->assertFileExists($this->itemsPath . '/.i-am-invisible');
         $this->assertFileExists($this->itemsPath . '/definitely_invalid.json');
         $this->assertFileNotExists($this->itemsPath . '/expired.json');
+        $this->assertFileNotExists($this->itemsPath . '/expired-with-dir.json');
         $this->assertFileExists($this->itemsPath . '/invalid-extension.txt');
         $this->assertFileExists($this->itemsPath . '/no-activity.json');
         $this->assertFileExists($this->itemsPath . '/no-expiry.json');
@@ -104,7 +113,13 @@ class ItemsTest extends TestCase
         $this->assertFileNotExists($this->itemsPath . '/only-expiry.json');
         $this->assertFileNotExists($this->itemsPath . '/only-timeout.json');
         $this->assertFileExists($this->itemsPath . '/valid.json');
+        $this->assertFileExists($this->itemsPath . '/valid-with-dir.json');
         $this->assertFileExists($this->filesPath . '/.i-am-invisible');
+        $this->assertFileExists($this->filesPath . '/another-id/file.txt');
+        $this->assertFileExists($this->filesPath . '/another-id/another-file.txt');
+        $this->assertFileNotExists($this->filesPath . '/existing-id/file.txt');
+        $this->assertDirectoryNotExists($this->filesPath . '/existing-id');
+        $this->assertFileExists($this->filesPath . '/orphaned/orphaned.txt');
         $this->assertFileNotExists($this->filesPath . '/expired.txt');
         $this->assertFileExists($this->filesPath . '/no-activity.txt');
         $this->assertFileExists($this->filesPath . '/no-expiry.txt');

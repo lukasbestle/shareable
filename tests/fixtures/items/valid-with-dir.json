@@ -3,7 +3,7 @@
   "created": 1234567890,
   "downloads": 543,
   "expires": 9999999999,
-  "filename": "existing-id/file.txt",
+  "filename": "another-id/file.txt",
   "timeout": 2678400,
   "user": "admin"
 }
