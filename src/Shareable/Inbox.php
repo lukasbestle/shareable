@@ -106,7 +106,7 @@ class Inbox extends Collection
             }
 
             // make sure we don't overwrite any existing file in the inbox
-            $filename = static::findFilepath($this->inboxPath, $files['name'][$key]);
+            $filename = $this->findFilepath($this->inboxPath, null, $files['name'][$key]);
 
             // move the uploaded file to the inbox
             $destination = $this->inboxPath . '/' . $filename;
@@ -181,7 +181,7 @@ class Inbox extends Collection
         }
 
         // make sure we don't overwrite any existing file
-        $filename = static::findFilepath($this->filesPath, $file->getFilename());
+        $filename = $this->findFilepath($this->filesPath, $props['id'] ?? uniqid(), $file->getFilename());
 
         // create the item
         $props['filename'] = $filename;
@@ -204,20 +204,38 @@ class Inbox extends Collection
 
     /**
      * Finds a unique file path by adding a number suffix to the
-     * filename until the file doesn't exist
+     * filename/name of the subdir until the file/dir doesn't exist
      *
-     * @param  string $directory Path to put the file in
-     * @param  string $filename  Base filename
-     * @return string            Filename with the suffix
+     * @param  string      $directory Path to put the file in
+     * @param  string|null $subdir    Subdir name to use (when enabled); null for none
+     * @param  string      $filename  Base filename
+     * @return string                 Filename with the suffix
      */
-    protected static function findFilepath(string $directory, string $filename): string
+    protected function findFilepath(string $directory, ?string $subdir, string $filename): string
     {
+        $suffix = 0;
+        clearstatcache();
+
+        // check if we are in subdir mode
+        if ($this->app->subdirs() === true && is_string($subdir)) {
+            // yes, find a unique folder name
+            $originalSubdir = $subdir;
+
+            while (file_exists($directory . '/' . $subdir)) {
+                $suffix++;
+                $subdir = $originalSubdir . '-' . $suffix;
+            }
+
+            // ensure that the directory is there
+            mkdir($directory . '/' . $subdir);
+            return $subdir . '/' . $filename;
+        }
+
+        // no, find a unique file name
         $basename  = F::name($filename);
         $extension = F::extension($filename);
 
-        $suffix = 0;
-        clearstatcache();
-        while (is_file($directory . '/' . $filename)) {
+        while (file_exists($directory . '/' . $filename)) {
             $suffix++;
             $filename = $basename . '-' . $suffix . '.' . $extension;
         }

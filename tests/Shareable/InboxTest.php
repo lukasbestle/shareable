@@ -4,6 +4,7 @@ namespace LukasBestle\Shareable;
 
 use Exception;
 use ReflectionMethod;
+use ReflectionProperty;
 use SplFileInfo;
 use Kirby\Cms\App as Kirby;
 use Kirby\Toolkit\F;
@@ -228,12 +229,12 @@ class InboxTest extends TestCase
             'created'   => strtotime('2018-01-02'),
             'downloads' => 0,
             'expires'   => strtotime('2018-01-03'),
-            'filename'  => 'new-file.txt',
+            'filename'  => 'new-id/new-file.txt',
             'timeout'   => 172800,
             'user'      => 'anonymous'
         ], $this->app->items()->get('new-id')->toArray());
-        $this->assertFileExists($this->filesPath . '/new-file.txt');
-        $this->assertEquals('new-file', file_get_contents($this->filesPath . '/new-file.txt'));
+        $this->assertFileExists($this->filesPath . '/new-id/new-file.txt');
+        $this->assertEquals('new-file', file_get_contents($this->filesPath . '/new-id/new-file.txt'));
         $this->assertEquals(201, $response->code());
         $this->assertEquals('text/plain', $response->type());
         $this->assertEquals('Success', $response->body());
@@ -254,7 +255,7 @@ class InboxTest extends TestCase
         $_POST = [
             'created'  => '2018-01-02',
             'expires'  => '',
-            'id'       => 'new-id',
+            'id'       => 'existing-id',
             'timeout'  => '+2 days',
             'user'    => 'admin',
 
@@ -268,12 +269,12 @@ class InboxTest extends TestCase
             'created'   => strtotime('2018-01-02'),
             'downloads' => 0,
             'expires'   => false,
-            'filename'  => 'valid-1.txt',
+            'filename'  => 'existing-id-1/valid.txt',
             'timeout'   => 172800,
             'user'      => 'anonymous'
-        ], $this->app->items()->get('new-id')->toArray());
-        $this->assertFileExists($this->filesPath . '/valid-1.txt');
-        $this->assertEquals('valid-inbox', file_get_contents($this->filesPath . '/valid-1.txt'));
+        ], $this->app->items()->get('existing-id')->toArray());
+        $this->assertFileExists($this->filesPath . '/existing-id-1/valid.txt');
+        $this->assertEquals('valid-inbox', file_get_contents($this->filesPath . '/existing-id-1/valid.txt'));
         $this->assertEquals('/_admin/items', $response->header('Location'));
         $this->assertEquals(302, $response->code());
     }
@@ -298,7 +299,7 @@ class InboxTest extends TestCase
             'created'   => strtotime('2018-01-02'),
             'downloads' => 0,
             'expires'   => false,
-            'filename'  => 'new-file.txt',
+            'filename'  => 'new-id/new-file.txt',
             'timeout'   => 3600,
             'user'      => 'anonymous'
         ], $this->app->items()->get('new-id')->toArray());
@@ -325,7 +326,7 @@ class InboxTest extends TestCase
             'created'   => strtotime('2018-01-02'),
             'downloads' => 0,
             'expires'   => false,
-            'filename'  => 'new-file.txt',
+            'filename'  => 'new-id/new-file.txt',
             'timeout'   => 3600,
             'user'      => 'anonymous'
         ], $this->app->items()->get('new-id')->toArray());
@@ -352,7 +353,7 @@ class InboxTest extends TestCase
             'created'   => time(),
             'downloads' => 0,
             'expires'   => false,
-            'filename'  => 'new-file.txt',
+            'filename'  => 'new-id/new-file.txt',
             'timeout'   => 3600,
             'user'      => 'anonymous'
         ], $this->app->items()->get('new-id')->toArray());
@@ -379,7 +380,7 @@ class InboxTest extends TestCase
             'created'   => strtotime('2018-01-02'),
             'downloads' => 0,
             'expires'   => false,
-            'filename'  => 'new-file.txt',
+            'filename'  => 'new-id/new-file.txt',
             'timeout'   => 3600,
             'user'      => 'anonymous'
         ], $this->app->items()->get('new-id')->toArray());
@@ -451,15 +452,33 @@ class InboxTest extends TestCase
      */
     public function testFindFilepath()
     {
-        $method = new ReflectionMethod(Inbox::class, 'findFilepath');
-        $method->setAccessible(true);
+        $findFilepathMethod = new ReflectionMethod(Inbox::class, 'findFilepath');
+        $findFilepathMethod->setAccessible(true);
 
-        $this->assertEquals('new-file.txt', $method->invoke(null, $this->filesPath, 'new-file.txt'));
-        $this->assertEquals('valid-1.txt', $method->invoke(null, $this->filesPath, 'valid.txt'));
-        $this->assertEquals('only-2.txt', $method->invoke(null, $this->filesPath, 'only.txt'));
-        $this->assertEquals('only-1-1.txt', $method->invoke(null, $this->filesPath, 'only-1.txt'));
-        $this->assertEquals('new-file.abc.txt', $method->invoke(null, $this->filesPath, 'new-file.abc.txt'));
-        $this->assertEquals('orphaned.abc-1.txt', $method->invoke(null, $this->filesPath, 'orphaned.abc.txt'));
+        $subdirsProp = new ReflectionProperty(App::class, 'subdirs');
+        $subdirsProp->setAccessible(true);
+
+        // flat file mode
+        $this->assertEquals('new-file.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, null, 'new-file.txt'));
+        $this->assertEquals('valid-1.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, null, 'valid.txt'));
+        $this->assertEquals('only-2.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, null, 'only.txt'));
+        $this->assertEquals('only-1-1.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, null, 'only-1.txt'));
+        $this->assertEquals('new-file.abc.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, null, 'new-file.abc.txt'));
+        $this->assertEquals('orphaned.abc-1.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, null, 'orphaned.abc.txt'));
+
+        // subdir mode
+        $this->assertDirectoryNotExists($this->filesPath . '/id');
+        $this->assertEquals('id/new-file.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'id', 'new-file.txt'));
+        $this->assertDirectoryExists($this->filesPath . '/id');
+
+        $this->assertEquals('another-id/valid.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'another-id', 'valid.txt'));
+        $this->assertEquals('another-id-1/only.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'another-id', 'only.txt'));
+        $this->assertEquals('another-id-2/only.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'another-id', 'only.txt'));
+        $this->assertEquals('another-id-1-1/only.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'another-id-1', 'only.txt'));
+
+        // subdir mode but subdirs disabled in config
+        $subdirsProp->setValue($this->app, false);
+        $this->assertEquals('new-file.txt', $findFilepathMethod->invoke($this->inbox, $this->filesPath, 'id', 'new-file.txt'));
     }
 
     /**

@@ -25,6 +25,7 @@ class App
     // Config properties
     protected $debug = false;
     protected $fileUrl;
+    protected $subdirs = true;
     protected $paths;
     protected $routes = [];
     protected $users = [];
@@ -106,6 +107,16 @@ class App
     public function fileUrl(string $filename = ''): string
     {
         return $this->fileUrl . $filename;
+    }
+
+    /**
+     * Returns the subdirs mode
+     *
+     * @return boolean
+     */
+    public function subdirs(): bool
+    {
+        return $this->subdirs;
     }
 
     /**
@@ -246,6 +257,18 @@ class App
     {
         // ensure that the URL ends with exactly one slash
         $this->fileUrl = rtrim($url, '/') . '/';
+        return $this;
+    }
+
+    /**
+     * Sets the subdirs option
+     * When enabled, publishing files creates subdirectories inside the "files" dir
+     *
+     * @param bool $debug Whether debugging should be enabled
+     */
+    protected function setSubdirs(bool $subdirs = true): self
+    {
+        $this->subdirs = $subdirs;
         return $this;
     }
 

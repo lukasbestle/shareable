@@ -14,6 +14,12 @@ return [
     'fileUrl' => 'https://cdn.example.com',
 
     /**
+     * Whether to create subdirectories for the published files inside the "files" dir
+     * OPTIONAL, defaults to true
+     */
+    'subdirs' => true,
+
+    /**
      * Paths to the data directories; you can move those directories to wherever you like
      * REQUIRED
      */

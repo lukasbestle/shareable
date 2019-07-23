@@ -13,7 +13,7 @@ class ItemCollectionTest extends TestCase
     public function testConstruct()
     {
         $collection = new ItemCollection($this->app, $this->itemsPath);
-        $this->assertEquals(7, $collection->count());
+        $this->assertEquals(8, $collection->count());
         $this->assertEquals([
             'expired',
             'no-activity',
@@ -21,6 +21,7 @@ class ItemCollectionTest extends TestCase
             'not-started',
             'only-expiry',
             'only-timeout',
+            'valid-with-dir',
             'valid'
         ], $collection->keys());
         $this->assertInstanceOf(Item::class, $collection->get('valid'));

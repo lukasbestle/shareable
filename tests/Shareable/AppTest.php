@@ -14,11 +14,13 @@ class AppTest extends TestCase
      * @covers ::__construct
      * @covers ::setDebug
      * @covers ::setFileUrl
+     * @covers ::setSubdirs
      * @covers ::setPaths
      * @covers ::setRoutes
      * @covers ::setUsers
      * @covers ::debug
      * @covers ::filePath
+     * @covers ::subdirs
      * @covers ::users
      */
     public function testConstruct()
@@ -37,6 +39,7 @@ class AppTest extends TestCase
         ]);
         $this->assertEquals(false, $app->debug());
         $this->assertEquals('https://cdn.example.com/', $app->fileUrl());
+        $this->assertEquals(true, $app->subdirs());
         $this->assertEquals($this->filesPath . '/', $app->filePath());
         $this->assertEquals(1, count($app->users()));
         $this->assertEquals('anonymous', $app->users()->first()->username());
@@ -45,6 +48,7 @@ class AppTest extends TestCase
         $app = new App([
             'debug'   => true,
             'fileUrl' => 'https://example.com/cdn///',
+            'subdirs' => false,
             'paths'   => [
                 'files' => $this->filesPath . '///',
                 'inbox' => $this->inboxPath,
@@ -59,6 +63,7 @@ class AppTest extends TestCase
         ]);
         $this->assertEquals(true, $app->debug());
         $this->assertEquals('https://example.com/cdn/', $app->fileUrl());
+        $this->assertEquals(false, $app->subdirs());
         $this->assertEquals($this->filesPath . '/', $app->filePath());
         $this->assertContains('test-route', $routesProp->getValue($app));
         $this->assertEquals(2, count($app->users()));
