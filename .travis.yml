@@ -1,13 +1,11 @@
 language: php
-
-os:
-  - linux
-
+os: linux
 sudo: false
 
 php:
   - 7.1
   - 7.2
+  - 7.3
 
 install:
   # Install composer packages, will also trigger dump-autoload
@@ -15,21 +13,21 @@ install:
   - composer install --no-interaction
 
   # Install coveralls.phar
-  - wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar
-  - chmod +x coveralls.phar
-  - php coveralls.phar --version
+  - wget -c -nc --retry-connrefused --tries=0 https://github.com/php-coveralls/php-coveralls/releases/download/v2.1.0/php-coveralls.phar
+  - chmod +x php-coveralls.phar
+  - php php-coveralls.phar --version
 
 before_script:
   - mkdir -p build/logs
   - ls -al
 
 script:
+  - composer validate
   - phpunit --coverage-clover build/logs/clover.xml
-  - phpenv config-rm xdebug.ini
-  - vendor/bin/php-cs-fixer fix src/ --verbose --diff --dry-run
+  - PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix . --verbose --diff --dry-run
 
 after_success:
-  - travis_retry php coveralls.phar -v
+  - travis_retry php php-coveralls.phar -v
 
 cache:
   directories:
