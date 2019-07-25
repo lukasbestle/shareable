@@ -93,14 +93,12 @@ class ItemsTest extends TestCase
         $this->assertFileExists($this->filesPath . '/valid.txt');
 
         $warnings = $this->items->cleanUp();
-        $this->assertEquals(
-            'File "' . $this->filesPath . '/missing-file.txt" for item "not-started" does not exist' . "\n" .
-            'File "' . $this->filesPath . '/another-id/another-file.txt" is orphaned' . "\n" .
-            'File "' . $this->filesPath . '/orphaned/orphaned.txt" is orphaned' . "\n" .
-            'File "' . $this->filesPath . '/orphaned.abc.txt" is orphaned' . "\n",
-
-            $warnings
-        );
+        $this->assertEqualsCanonicalizing([
+            'File "' . $this->filesPath . '/missing-file.txt" for item "not-started" does not exist',
+            'File "' . $this->filesPath . '/another-id/another-file.txt" is orphaned',
+            'File "' . $this->filesPath . '/orphaned/orphaned.txt" is orphaned',
+            'File "' . $this->filesPath . '/orphaned.abc.txt" is orphaned'
+        ], explode("\n", trim($warnings)));
 
         $this->assertFileExists($this->itemsPath . '/.i-am-invisible');
         $this->assertFileExists($this->itemsPath . '/definitely_invalid.json');

@@ -39,7 +39,7 @@ class BijectiveEncoderTest extends PHPUnitTestCase
 
         $expected = base_convert($integer, 10, 36);
         $this->assertEquals($expected, BijectiveEncoder::encode($integer));
-        $this->assertEquals($integer,  BijectiveEncoder::decode($expected));
+        $this->assertEquals($integer, BijectiveEncoder::decode($expected));
     }
 
     public function providerBase36()
@@ -61,7 +61,7 @@ class BijectiveEncoderTest extends PHPUnitTestCase
      */
     public function testDefault($integer, $string)
     {
-        $this->assertEquals($string,  BijectiveEncoder::encode($integer));
+        $this->assertEquals($string, BijectiveEncoder::encode($integer));
         $this->assertEquals($integer, BijectiveEncoder::decode($string));
     }
 

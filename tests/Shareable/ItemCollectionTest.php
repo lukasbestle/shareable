@@ -15,15 +15,15 @@ class ItemCollectionTest extends TestCase
         $collection = new ItemCollection($this->app, $this->itemsPath);
         $this->assertEquals(9, $collection->count());
         $this->assertEquals([
-            'expired-with-dir',
             'expired',
+            'expired-with-dir',
             'no-activity',
             'no-expiry',
             'not-started',
             'only-expiry',
             'only-timeout',
-            'valid-with-dir',
-            'valid'
+            'valid',
+            'valid-with-dir'
         ], $collection->keys());
         $this->assertInstanceOf(Item::class, $collection->get('valid'));
     }

@@ -68,7 +68,6 @@ class AppTest extends TestCase
         $this->assertContains('test-route', $routesProp->getValue($app));
         $this->assertEquals(2, count($app->users()));
         $this->assertEquals('lukas', $app->users()->first()->username());
-
     }
 
     /**
