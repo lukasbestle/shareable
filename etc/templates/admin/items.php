@@ -25,7 +25,7 @@
       <td data-label="ID"><a href="<?= url($itemName) ?>"><?= $itemName ?></a></td>
       <td data-label="Created"><?= $item->created('Y-m-d H:i') ?></td>
       <td data-label="Invalidity date"><?= $item->invalidityDate('Y-m-d H:i') ?></td>
-      <td data-label="Filename"><?= $item->filename() ?></td>
+      <td data-label="Filename"><?= basename($item->filename()) ?></td>
       <td data-label="User"><?= $item->user() ?></td>
       <td class="table__column--center" data-label="Downloads"><?= $item->downloads() ?></td>
       <td data-label="Actions"><a class="icon" href="<?= url('_admin/items/' . $itemName) ?>" title="Info as JSON">📍</a><a class="icon" href="<?= url('_admin/items/' . $itemName . '/delete') ?>" title="Delete">🗑</a></td>
