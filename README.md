@@ -49,16 +49,16 @@ You will be prompted for the following options:
   If you leave this field empty, the file will immediately be public.
 - **Expires**  
   The time when the file should expire. After that time the file won't be accessible.  
-  If you remove the default value and leave the field empty, the file will never expire.
+  If you remove the default value and leave the field empty, the file will never expire.  
   If given as a relative value (e.g. `+ 1 year`), the relative date is calculated from the "Created" date.
 - **ID**  
   The slug in the shareable file URL.  
-  By default it will be randomly generated as a six-char alphanumerical string. The random ID includes the current date in an encoded form, so the random ID will never be the same as one generated in the past.  
+  By default it will be randomly generated as a six-char alphanumerical string. The random ID includes the current date in an encoded form, so the random ID will never be the same as one generated in the past.   
   If you want a custom ID for sharing, you can configure it here.
 - **Timeout**  
   An inactivity timeout. If the file hasn't been downloaded for this amount of time, the file is considered expired.  
   If you remove the default value and leave the field empty, no timeout is set.
-- **Start timeout immediately**
+- **Start timeout immediately**  
   If checked, the timeout will be active from the "Created" date on. Otherwise it will be active after the first download. This allows two different use-cases:
   - **Immediate start**: You want to share a file with a group of people and automatically want to delete it once no one downloads it anymore. Particularly useful together with a fixed expiry time (e.g. "expire in one year, but quicker if no one downloaded the file for a month").
   - **Start with the first download**: You want to share a file with one person only and want to delete the file after they have downloaded it (e.g. "delete the file two days after the last download"). By not starting the timeout immediately, you give the recipient time to download the file for the first time (which will then start the timeout timer). Please note however that a request is sometimes triggered by apps without the recipient actively clicking on a link (e.g. by messenger apps when generating a URL preview). This feature unfortunately won't work for those use-cases.
