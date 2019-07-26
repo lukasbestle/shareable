@@ -78,6 +78,7 @@ class ItemsTest extends TestCase
         $this->assertFileExists($this->itemsPath . '/not-started.json');
         $this->assertFileExists($this->itemsPath . '/only-expiry.json');
         $this->assertFileExists($this->itemsPath . '/only-timeout.json');
+        $this->assertFileExists($this->itemsPath . '/UpPeRcAsE.json');
         $this->assertFileExists($this->itemsPath . '/valid.json');
         $this->assertFileExists($this->itemsPath . '/valid-with-dir.json');
         $this->assertFileExists($this->filesPath . '/.i-am-invisible');
@@ -110,6 +111,7 @@ class ItemsTest extends TestCase
         $this->assertFileExists($this->itemsPath . '/not-started.json');
         $this->assertFileNotExists($this->itemsPath . '/only-expiry.json');
         $this->assertFileNotExists($this->itemsPath . '/only-timeout.json');
+        $this->assertFileExists($this->itemsPath . '/UpPeRcAsE.json');
         $this->assertFileExists($this->itemsPath . '/valid.json');
         $this->assertFileExists($this->itemsPath . '/valid-with-dir.json');
         $this->assertFileExists($this->filesPath . '/.i-am-invisible');

@@ -43,6 +43,6 @@ class ItemCollection extends Collection
         // sort by item name
         ksort($data);
 
-        parent::__construct($data);
+        $this->data = $data;
     }
 }

@@ -13,8 +13,9 @@ class ItemCollectionTest extends TestCase
     public function testConstruct()
     {
         $collection = new ItemCollection($this->app, $this->itemsPath);
-        $this->assertEquals(9, $collection->count());
+        $this->assertEquals(10, $collection->count());
         $this->assertEquals([
+            'UpPeRcAsE',
             'expired',
             'expired-with-dir',
             'no-activity',
@@ -26,5 +27,6 @@ class ItemCollectionTest extends TestCase
             'valid-with-dir'
         ], $collection->keys());
         $this->assertInstanceOf(Item::class, $collection->get('valid'));
+        $this->assertInstanceOf(Item::class, $collection->get('UpPeRcAsE'));
     }
 }
