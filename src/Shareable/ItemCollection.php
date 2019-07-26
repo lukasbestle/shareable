@@ -40,6 +40,9 @@ class ItemCollection extends Collection
             $data[$basename] = new Item($app, $file->getPathname());
         }
 
+        // sort by item name
+        ksort($data);
+
         parent::__construct($data);
     }
 }
